@@ -1,101 +1,201 @@
-import Image from "next/image";
+'use client';
+
+import ContactForm from '@/components/ContactForm';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+
+interface GalleryImage {
+  id: string;
+  name: string;
+  url: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftButton, setShowLeftButton] = useState(false);
+  const [showRightButton, setShowRightButton] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    async function fetchImages() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/images', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(
+            errorData?.error || `HTTP error! status: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          console.error('Invalid data format:', data);
+          throw new Error('Invalid data format received from server');
+        }
+
+        setImages(data);
+      } catch (err) {
+        console.error('Error fetching images:', err);
+        setError(
+          err instanceof Error 
+            ? err.message 
+            : 'An unexpected error occurred while loading images'
+        );
+        setImages([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchImages();
+  }, []);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setShowLeftButton(scrollLeft > 0);
+      setShowRightButton(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 350; // Slightly more than image width + gap
+      const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+      scrollContainerRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      {/* Home Section */}
+      <section id="home" className="min-h-screen flex flex-col bg-white dark:bg-gray-900 pt-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-32">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-thin mb-4 text-gray-900 dark:text-white">
+            Tranquility on Canvas: Where Serenity Meets Art
+          </h1>
+          <h2 className="text-base sm:text-lg md:text-xl font-thin text-gray-800 dark:text-gray-200">
+            Made by {process.env.NEXT_PUBLIC_ARTIST_NAME}
+          </h2>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Horizontal Scrollable Gallery */}
+        <div className="w-full relative">
+          {error && (
+            <div className="max-w-[90%] mx-auto mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-md">
+              {error}
+            </div>
+          )}
+          
+          {loading ? (
+            <div className="max-w-[90%] mx-auto">
+              <div className="flex space-x-8 pb-4 px-4">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="flex-none">
+                    <div className="relative w-[300px] h-[450px] bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {showLeftButton && (
+                <button
+                  onClick={() => scroll('left')}
+                  className="absolute left-8 top-1/2 -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 p-2 rounded-full shadow-lg transition-all"
+                  aria-label="Scroll left"
+                >
+                  <FiChevronLeft size={24} className="text-gray-800 dark:text-gray-200" />
+                </button>
+              )}
+              {showRightButton && (
+                <button
+                  onClick={() => scroll('right')}
+                  className="absolute right-8 top-1/2 -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 p-2 rounded-full shadow-lg transition-all"
+                  aria-label="Scroll right"
+                >
+                  <FiChevronRight size={24} className="text-gray-800 dark:text-gray-200" />
+                </button>
+              )}
+              <div 
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="max-w-[90%] mx-auto overflow-x-auto scrollbar-hide"
+              >
+                <div className="flex space-x-8 pb-4 px-4">
+                  {images.map((image) => (
+                    <Link key={image.id} href={`/gallery/${image.id}`} className="flex-none group">
+                      <div className="relative w-[300px] h-[450px] overflow-hidden rounded-lg 
+                        shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.07)]
+                        group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_20px_40px_rgba(255,255,255,0.1)]
+                        group-hover:-translate-y-1
+                        transition-all duration-300">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <Image
+                          src={image.url}
+                          alt={image.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <h2 className="text-3xl sm:text-4xl font-thin mb-8 text-center text-gray-900 dark:text-white">
+            About
+          </h2>
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 font-thin">
+              Welcome to my artistic journey. I am {process.env.NEXT_PUBLIC_ARTIST_NAME}, an artist dedicated to capturing
+              the essence of tranquility through my work. My pieces reflect the serene moments in
+              life, translated onto canvas with careful attention to detail and emotion.
+            </p>
+            <p className="text-gray-800 dark:text-gray-200">
+              Each artwork is a unique exploration of peace and harmony, created to bring a sense
+              of calm and reflection to any space. Through my art, I aim to create windows into
+              moments of pure serenity, allowing viewers to find their own peaceful connection
+              with each piece.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section
+        id="contact"
+        className="min-h-screen flex items-center justify-center bg-cover bg-center"
+        style={{ backgroundImage: 'url("/contact-bg.jpg")' }}
+      >
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+          <ContactForm />
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dynamic Art Gallery
+
+A modern, responsive art gallery website built with Next.js 13+, featuring dynamic content management, dark mode support, and a beautiful UI for showcasing artwork.
+
+## Features
+
+- 🎨 Dynamic artist name and content through environment variables
+- 🌓 Dark mode support with persistent user preference
+- 📱 Fully responsive design
+- 🖼️ Image gallery with zoom functionality
+- 💬 Comment system for artwork
+- 🔐 Admin panel for content management
+- 🔄 Real-time image updates
+- 🏷️ Tag-based image categorization
+- 📝 Contact form for inquiries
+
+## Tech Stack
+
+- **Framework**: Next.js 13+ (App Router)
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL with Prisma ORM
+- **Storage**: Supabase Storage
+- **Authentication**: Supabase Auth
+- **Deployment**: [Your deployment platform]
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- PostgreSQL database
+- Supabase account
+
+### Environment Setup
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [your-repo-url]
+cd [your-repo-name]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create a `.env` file in the root directory with the following variables:
+```env
+DATABASE_URL="your-postgresql-url"
+NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-key"
+NEXT_PUBLIC_ARTIST_NAME="Your Artist Name"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Initialize the database:
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-## Learn More
+### Development
 
-To learn more about Next.js, take a look at the following resources:
+Run the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application will be available at `http://localhost:3000`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Building for Production
 
-## Deploy on Vercel
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                    # Next.js 13+ app directory
+│   ├── admin/             # Admin dashboard
+│   ├── api/               # API routes
+│   ├── gallery/           # Gallery pages
+│   └── page.tsx           # Home page
+├── components/            # Reusable components
+├── context/              # React context providers
+├── lib/                  # Utility functions and configurations
+└── scripts/              # Database scripts and utilities
+```
+
+## Features in Detail
+
+### Dynamic Content
+- Set the artist name and other content through environment variables
+- Easy to customize for different artists or galleries
+
+### Gallery Management
+- Upload, edit, and delete images
+- Add descriptions and tags
+- Organize images with categories
+- Comment system for visitor engagement
+
+### Admin Dashboard
+- Secure admin access
+- Content management interface
+- Image upload with preview
+- Tag management system
+
+### User Experience
+- Smooth image loading and transitions
+- Responsive design for all devices
+- Dark mode support
+- Intuitive navigation
+
+## Contributing
+
+[Your contribution guidelines]
+
+## License
+
+[Your chosen license]
+
+## Contact
+
+[Your contact information]
+
+---
+Built with ❤️ using Next.js and Tailwind CSS

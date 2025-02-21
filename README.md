@@ -1,7 +1,7 @@
 # Dynamic Art Gallery
 
 A modern, responsive art gallery website built with Next.js 13+, featuring dynamic content management, dark mode support, and a beautiful UI for showcasing artwork.
-
+test
 ## Features
 
 - 🎨 Dynamic artist name and content through environment variables
